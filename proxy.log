@@ -1,0 +1,33 @@
+2025-09-08 19:26:36,016 - 
+            === New Request ===
+            Method: POST
+            Client IP: 127.0.0.1
+            Forward URL: https://httpbin.org/post
+            Headers: {'content-length': '26', 'content-type': 'application/json', 'host': '127.0.0.1:8000', 'user-agent': 'curl/8.5.0', 'accept': '*/*', 'x-forward-url': 'https://httpbin.org/post'}
+            Body: {"name": "raj", "age": 17}
+
+            --- Response ---
+            Status Code: 200
+            Headers: {'Date': 'Mon, 08 Sep 2025 19:26:35 GMT', 'Content-Type': 'application/json', 'Content-Length': '542', 'Connection': 'keep-alive', 'Server': 'gunicorn/19.9.0', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': 'true'}
+            Body: {
+  "args": {}, 
+  "data": "{\"name\": \"raj\", \"age\": 17}", 
+  "files": {}, 
+  "form": {}, 
+  "headers": {
+    "Accept": "*/*", 
+    "Accept-Encoding": "gzip, deflate", 
+    "Content-Length": "26", 
+    "Content-Type": "application/json", 
+    "Host": "127.0.0.1", 
+    "User-Agent": "curl/8.5.0", 
+    "X-Amzn-Trace-Id": "Root=1-68bf2dea-1eb0fc5624c1e9413522856c", 
+    "X-Forward-Url": "https://httpbin.org/post"
+  }, 
+  "json": {
+    "age": 17, 
+    "name": "raj"
+  }, 
+  "origin": "160.238.79.
+            ====================
+                
