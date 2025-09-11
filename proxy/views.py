@@ -91,3 +91,19 @@ class Catch(View):
             )
 
                     )
+    
+
+class LogsView(View):
+    def get(self,request):
+        requests_data=list(
+            CapturedRequests.objects.order_by("-timestamp").values()
+        )
+        responses_data=list(
+            CapturedResponses.objects.order_by("-created_at").values()
+        )
+        return JsonResponse(
+            {
+                "requests":requests_data,
+                "responses":responses_data
+            },safe=False
+        )
