@@ -1,197 +1,170 @@
 # Django HTTP Request Interceptor & Proxy
 
-A powerful Django-based HTTP request interceptor and proxy service that captures, logs, and optionally forwards HTTP requests. Perfect for debugging, monitoring, API testing, and request analysis.
+[![Django](https://img.shields.io/badge/Django-5.2+-green.svg)](https://www.djangoproject.com/)
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
 
-## 🚀 Features
 
-- **Request Interception**: Captures all incoming HTTP requests with complete details
-- **Optional Forwarding**: Forward requests to target URLs using the `X-Forward-URL` header
-- **Comprehensive Logging**: Dual logging system (database + file)
-- **Admin Interface**: Built-in Django admin for viewing captured requests and responses
-- **Full HTTP Method Support**: Handles GET, POST, PUT, DELETE, PATCH, and all other HTTP methods
-- **Client IP Tracking**: Records client IP addresses for each request
-- **Response Capture**: Stores response status, headers, and body when forwarding
-- **Real-time Monitoring**: Live request/response logging with timestamps
+A lightweight Django service for intercepting, logging, and optionally forwarding HTTP requests. Perfect for webhook testing, API debugging, and request monitoring.
 
-## 📋 Requirements
+## ✨ Features
 
+- 🔍 **Capture All HTTP Methods** - GET, POST, PUT, DELETE, PATCH, etc.
+- 🔄 **Optional Request Forwarding** - Forward to any URL via custom header
+- 💾 **Dual Logging** - Database storage + file logging
+- 🖥️ **Admin Interface** - Built-in Django admin for request analysis
+- 🌐 **Client IP Tracking** - Monitor request origins
+- ⚡ **Real-time Processing** - Instant request/response handling
+- 🛡️ **CSRF Exempt** - Accept external requests without tokens
+
+## 🚀 Quick Start
+
+### Prerequisites
 - Python 3.8+
 - Django 5.2+
-- requests library
 
-## 🛠️ Installation
+### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone <your-repository-url>
+   git clone https://github.com/yourusername/django-http-interceptor.git
    cd django-http-interceptor
    ```
 
 2. **Install dependencies**
    ```bash
-   pip install django requests
-   # or if you have a requirements.txt
    pip install -r requirements.txt
    ```
 
-3. **Run migrations**
+3. **Setup the database**
    ```bash
    python manage.py makemigrations
    python manage.py migrate
    ```
 
-4. **Create a superuser (optional, for admin access)**
+4. **Create admin user (optional)**
    ```bash
    python manage.py createsuperuser
    ```
 
-5. **Start the development server**
+5. **Run the server**
    ```bash
    python manage.py runserver
    ```
 
-## 📖 Usage
+The service will be available at `http://localhost:8000/proxy/catch/`
 
-### Basic Request Capture
+## 📚 Usage
 
-Send any HTTP request to the catch endpoint:
+### Basic Request Interception
+
+Send any request to capture and log it:
 
 ```bash
-# Simple request capture
 curl -X POST http://localhost:8000/proxy/catch/ \
   -H "Content-Type: application/json" \
-  -d '{"message": "Hello World"}'
+  -d '{"test": "data"}'
 ```
 
 ### Request Forwarding
 
-Use the `X-Forward-URL` header to forward requests to another service:
+Forward requests to another service using the `X-Forward-URL` header:
 
 ```bash
-# Forward request to another API
 curl -X POST http://localhost:8000/proxy/catch/ \
   -H "Content-Type: application/json" \
-  -H "X-Forward-URL: https://api.example.com/endpoint" \
-  -d '{"data": "test"}'
+  -H "X-Forward-URL: https://httpbin.org/post" \
+  -d '{"message": "Hello World"}'
 ```
 
 ### Webhook Testing
 
-Perfect for testing webhooks during development:
+Point your webhook URLs to this service for testing:
 
-```bash
-# Configure your webhook provider to send to:
+```
 https://yourdomain.com/proxy/catch/
 ```
 
-## 🏗️ Project Structure
+## 🏗️ How It Works
 
-```
-mysite/
-├── proxy/
-│   ├── __init__.py
-│   ├── admin.py          # Admin interface configuration
-│   ├── models.py         # Database models for requests/responses
-│   ├── urls.py          # URL routing
-│   └── views.py         # Main interceptor logic
-├── mysite/
-│   ├── __init__.py
-│   ├── settings.py
-│   ├── urls.py          # Main URL configuration
-│   └── wsgi.py
-├── manage.py
-└── proxy.log            # Request/response log file
-```
+1. **Request Capture**: All incoming requests are intercepted at `/proxy/catch/`
+2. **Data Extraction**: Method, headers, body, and client IP are captured
+3. **Optional Forwarding**: If `X-Forward-URL` header is present, request is forwarded
+4. **Logging**: Request and response details are saved to database and log file
+5. **Response**: Returns either the forwarded response or a simple confirmation
 
-## 📊 Database Models
+## 📊 Data Storage
 
-### CapturedRequests
-Stores all intercepted request details:
+### Captured Requests Table
+- HTTP method and headers
+- Request body and client IP
+- Forward URL (if specified)
+- Timestamp
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `method` | TextField | HTTP method (GET, POST, etc.) |
-| `headers` | JSONField | Request headers as JSON |
-| `body` | TextField | Request body content |
-| `forward_url` | URLField | Target URL for forwarding |
-| `client_ip` | GenericIPAddressField | Client's IP address |
-| `timestamp` | DateTimeField | Request timestamp |
+### Captured Responses Table  
+- HTTP status code
+- Response headers and body
+- Linked to original request
 
-### CapturedResponses
-Stores response details when forwarding:
+## 🔍 Monitoring & Analysis
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `response_status` | IntegerField | HTTP status code |
-| `response_headers` | JSONField | Response headers as JSON |
-| `response_body` | TextField | Response body content |
+### Admin Interface
+Access at `http://localhost:8000/admin/` to:
+- Browse all captured requests and responses
+- Filter by method, IP, timestamp
+- Search through request bodies and headers
 
-## 🔍 Admin Interface
+### Log File
+Check `proxy.log` in the project root for detailed request/response logs.
 
-Access the Django admin interface to view captured requests and responses:
+## 💡 Use Cases
 
-1. Navigate to `http://localhost:8000/admin/`
-2. Log in with your superuser credentials
-3. View and filter captured requests and responses
+- **Webhook Development**: Test webhook integrations locally
+- **API Debugging**: Monitor and analyze API calls
+- **Request Forwarding**: Create a logging proxy for existing APIs
+- **Security Testing**: Analyze malicious request patterns
+- **Integration Testing**: Verify third-party service communications
 
-## 📝 Logging
+## 🛠️ Configuration
 
-The system provides dual logging:
+The service works out-of-the-box, but you can customize:
 
-### File Logging
-- **Location**: `proxy.log` in project root
-- **Format**: Timestamped entries with full request/response details
-- **Content**: Method, IP, headers, body, response status, and more
-
-### Database Logging
-- All requests and responses are stored in the database
-- Accessible via Django admin or direct database queries
-- Includes timestamps for historical analysis
-
-## 🔧 Configuration
-
-### CSRF Protection
-The interceptor is configured with `@csrf_exempt` to accept requests from external sources without CSRF tokens.
-
-### Headers Processing
-- Headers are normalized to lowercase for consistency
-- All headers are preserved and logged
-- Special handling for `X-Forward-URL` header
-
-## 🚀 Use Cases
-
-- **API Development**: Test and debug API endpoints
-- **Webhook Testing**: Receive and analyze webhook payloads
-- **Request Monitoring**: Monitor incoming requests to your services
-- **Proxy Services**: Forward requests with logging capabilities
-- **Security Analysis**: Analyze request patterns and headers
-- **Integration Testing**: Test third-party API integrations
-
-## 🛡️ Security Considerations
-
-- The service accepts requests without CSRF protection
-- Consider implementing authentication for production use
-- Be cautious when forwarding requests to external services
-- Monitor log files for sensitive data
-- Consider request rate limiting for production deployments
+- **Logging Level**: Modify `logger.setLevel()` in `views.py`
+- **Log File Location**: Change `proxy.log` path in the file handler
+- **Database Settings**: Standard Django database configuration
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
+Contributions are welcome! Here's how:
+
+1. Fork the project
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
+### Development Setup
 
-## 🆘 Support
+```bash
+git clone https://github.com/yourusername/django-http-interceptor.git
+cd django-http-interceptor
+pip install -r requirements.txt  # Create this with your dependencies
+python manage.py migrate
+python manage.py runserver
+```
 
-If you encounter any issues or have questions:
+## 🔒 Security Notes
 
-1. Check the `proxy.log` file for detailed request/response information
-2. Use the Django admin interface to inspect captured data
-3. Enable Django debug mode for detailed error messages
+- This service is designed for development and testing
+- Consider authentication for production deployments
+- Be cautious when forwarding to external URLs
+- Monitor logs for sensitive data exposure
+
+
+
+## ⭐ Show Your Support
+
+If this project helped you, please give it a ⭐ on GitHub!
 
 ---
 
-**Made with ❤️ using Django**
+**Built with Django** 🎸
